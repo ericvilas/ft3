@@ -11,8 +11,6 @@ import random as rand
 plt.ion()
 
 #############################################################
-# estas son las funciones que tienen que escribir ustedes
-# calcMagnet ya esta lista
 
 def calcMagnet(S):
 	"""
@@ -23,43 +21,39 @@ def calcMagnet(S):
 
 def calcEnergia(S):
     H = np.zeros((L, L))
-	for i in range(L):
+    for i in range(L):
         for j in range(L):
             k = (i + 1) % L
             l = (j + 1) % L
             H[i,j] = - S[i,j] * (S[k,j] + S[i,l])
     energia = np.sum(H)
-	return energia
+    return energia
 
-def difEnergia(S, Sprima, i, j):
+def difEnergia(S, i, j):
     k = (i + 1) % L
     l = (j + 1) % L
-    dE = (S[i,j] - Sprima[i,j])*(S[k,j] + S[i,l] + S[i-1, j] + S[i,j-1])
+    dE = 2*S[i,j]*(S[k,j] + S[i,l] + S[i-1, j] + S[i,j-1])
     return dE
 
 def ising2Dpaso(S, beta):
-	"""
-	Calcula el proximo estado de la red de spines, para un beta dado.
-	Devluelve el próximo S, y los cambios de energia y magnetizacion
-	"""
-    Sprima = S
+	# """
+	# Calcula el proximo estado de la red de spines, para un beta dado.
+	# Devluelve el próximo S, y los cambios de energia y magnetizacion
+	# """
     i = rand.choice(np.arange(L))
     j = rand.choice(np.arange(L))
-    Sprima[i,j] = -S[i,j]
-    dE = difEnergia(S, Sprima, i, j)
-    dM = Sprima[i,j] - S[i,j]
-    if dE <= 0 or rand.random() < np.exp(-beta*dE):
-        S = Sprima
-    else:
-        dE = 0
-        dM = 0
-	return S, dE, dM
+    dE = difEnergia(S, i, j)
+    dM = -2 * S[i,j]
+    if (dE <= 0 or rand.random() < np.exp(-beta*dE)):
+        S[i,j] = -S[i,j]
+        return S, dE, dM
+    return S, 0, 0
 #############################################################
 
 #Aca defino los parámetros y corro la cadena de markov
 #Lado de la red,
 L = 32
-T = 2.5
+T = 10000
 beta = 1/T
 
 #propongo un estado inicial al azar
@@ -68,8 +62,8 @@ beta = 1/T
 S = 2*(np.random.rand(L,L)>0.5) -1;
 
 # defino la cantidad de iteraciones de cada etapa
-npre = 100
-npasos = 1000
+npre = 10000
+npasos = 2000
 # me genero arrays vacios, a ser llenados con los valores de energia y magnetizacion
 energia= np.zeros(npasos)
 magnet = np.zeros(npasos)
