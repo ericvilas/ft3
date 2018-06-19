@@ -41,12 +41,13 @@ def ising2Dpaso(S, beta):
 	return S, 0, 0
 
 L = 32
+N = L*L
 T = 3
 beta = 1.0/T
 
 S = 2*(np.random.rand(L,L)>0.5) -1;
 
-npre = 1000000
+npre = 100
 npasos = 1000
 
 energia= np.zeros(npasos)
@@ -65,11 +66,20 @@ magnet[0] = calcMagnet(S)
 # fig_em, ax_list = plt.subplots(2,1)
 # ax_e, ax_m = ax_list
 
-for n in range(npasos-1):
+spinAvg = np.zeros(int(L/2))
+prodSpinAvg = np.zeros(int(L/2))
+
+for n in range(npasos - 1):
 
     S, dE, dM = ising2Dpaso(S,beta)
     energia[n+1] = energia[n] + dE
     magnet[n+1] = magnet[n] + dM
+
+    if n%100 == 1:
+        for r in range(int(L/2)):
+
+            spinAvg[r] = spinAvg[r] + S[0, r] / npasos
+            prodSpinAvg[r] = prodSpinAvg[r] + S[0, 0] * S[0, r] / npasos
 
     # if n%10 == 0:
 	#
